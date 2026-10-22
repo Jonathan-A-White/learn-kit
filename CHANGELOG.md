@@ -6,6 +6,17 @@ Each library keeps its own changelog; this one records the repo's releases and p
 
 - [@learn-kit/graph](packages/graph/CHANGELOG.md)
 - [@learn-kit/drill](packages/drill/CHANGELOG.md)
+- [@learn-kit/learner](packages/learner/CHANGELOG.md)
+
+## 0.1.6 (2026-10-22, not yet tagged)
+
+- New: `@learn-kit/learner` 0.1.0 (`learn-kit/learner`), the learner profile and a goal with its scaffolding (mw-79en7t.4): age,
+  boy or girl, experience, the kind of learner, speed and notes, each learned from talk with the turn it came from and merged surer
+  first, then newer; a goal `{ id, title, targets }` over a graph, its scaffold from the roots up with each node's supports until it
+  is solid, and its progress, 0 to 1. The commit that lands it is the one apps pin.
+- Changed: the consumer smoke test also installs and imports `learn-kit/learner`, and lets it import `learn-kit/graph` and nothing
+  else of the kit.
+- Package versions: graph 0.3.0, drill 0.1.0, learner 0.1.0.
 
 ## 0.1.5 (2026-10-22, not yet tagged)
 
