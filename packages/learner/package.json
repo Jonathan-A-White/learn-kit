@@ -1,0 +1,19 @@
+{
+  "name": "@learn-kit/learner",
+  "version": "0.1.0",
+  "description": "learn-kit: the learner profile (age, boy or girl, experience, kind of learner, speed, notes), each value learned from talk with the turn it came from, and a goal over a learn-kit/graph graph with its scaffolding, from the roots up, falling away as nodes go solid; no React, no Dexie, no subject.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist/**",
+    "!**/*.tsbuildinfo"
+  ]
+}
