@@ -1,7 +1,7 @@
 {
   "name": "learn-kit",
-  "version": "0.1.4",
-  "description": "The learning graph, levels, schedule, drills and learner profile shared by Lampas and Kestrel, as small framework-free libraries: @learn-kit/graph (nodes and needs, order, levels and a store, the frontier and the review schedule).",
+  "version": "0.1.5",
+  "description": "The learning graph, levels, schedule, drills and learner profile shared by Lampas and Kestrel, as small framework-free libraries: @learn-kit/graph (nodes and needs, order, levels and a store, the frontier and the review schedule) and @learn-kit/drill (the drill walk, forms, a sitting's mix and the placement).",
   "license": "MIT",
   "type": "module",
   "repository": {
@@ -19,6 +19,10 @@
       "types": "./packages/graph/dist/index.d.ts",
       "default": "./packages/graph/dist/index.js"
     },
+    "./drill": {
+      "types": "./packages/drill/dist/index.d.ts",
+      "default": "./packages/drill/dist/index.js"
+    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -27,7 +31,7 @@
     "!**/*.tsbuildinfo"
   ],
   "scripts": {
-    "build": "tsc -b packages/graph/tsconfig.build.json",
+    "build": "tsc -b packages/graph/tsconfig.build.json packages/drill/tsconfig.build.json",
     "prepare": "npm run build",
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json --noEmit",
