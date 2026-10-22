@@ -85,3 +85,70 @@ await levelOf(store, 'count'); // 'solid'
 await levelsOf(store, graph); // Map { 'count' => 'solid', 'add' => 'notYet', 'multiply' => 'notYet' }
 await store.get('count'); // { level: 'solid', since: <ms>, how: 'tested-out' }
 ```
+
+### the frontier
+
+The frontier is the nodes not solid whose every need is solid: what is ready to learn now. `frontierOf(graph, solid)` works it out
+from a set of solid ids; `frontier(store, graph)` from the store, and `solidOf(store, graph)` is the solid ids. It moves as nodes go
+solid.
+
+```ts
+import { frontier, frontierOf, memoryStore } from 'learn-kit/graph';
+
+frontierOf(graph, new Set(['count'])).map((n) => n.id); // ['add']
+const store = memoryStore();
+(await frontier(store, graph)).map((n) => n.id); // ['count']
+```
+
+### solid and tested out
+
+A node is solid when it is tested out, at once, or reviewed to the solid step (`SOLID_STEP`, the 14-day gap). `testOut` makes it
+solid how `TESTED_OUT` (`'tested-out'`) and puts it on the schedule at the 30-day step; `review` records one answer and moves the
+level from the new step (a wrong that drops a solid node below the step makes it the frontier again). A node's schedule is kept in
+its state, `review`.
+
+```ts
+import { review, solidOf, testOut } from 'learn-kit/graph';
+
+await testOut(store, graph, 'count');
+await solidOf(store, graph); // Set { 'count' }
+(await frontier(store, graph)).map((n) => n.id); // ['add']
+await review(store, graph, 'add', true); // 'frontier': right once, step 0; six rights in a row reach step 3, 'solid'
+```
+
+### one node at a time
+
+One node at a time is being learned, at the `'frontier'` level; `learning(store, graph)` is it. `teach` starts the learner on a node
+and, while another is being learned, writes nothing and answers `'busy'` until it is told `'switch'` (the other goes back to not yet,
+its schedule kept) or `'keep'`. A review never makes a second one, and proving the node being learned moves it on to the first ready
+node not yet. `place(store, graph, id, passed)` writes one placement result: a pass is tested out, and of the nodes not passed the
+first in the graph's order is the frontier.
+
+```ts
+import { learning, memoryStore, teach, testOut } from 'learn-kit/graph';
+
+const store = memoryStore();
+await testOut(store, graph, 'count');
+await teach(store, graph, 'add'); // { status: 'taught' }
+await teach(store, graph, 'multiply'); // { status: 'busy', other: 'add' }
+await testOut(store, graph, 'add');
+(await learning(store, graph)).map((n) => n.id); // ['multiply']
+```
+
+### the schedule
+
+The gaps are `STEP_DAYS`, 1, 3, 7, 14, 30 and 60 days, then a rare check every 90 (`RARE_CHECK_DAYS`). Right twice in a row moves a
+node up a step, a single right keeps its step, and one wrong drops it two steps and makes it due tomorrow. `nextReview(schedule,
+right, now)` is the schedule after one answer (`undefined` for a node not scheduled yet), `isDue(schedule, now)` whether it is due,
+`gapOf(step)` a step's gap in ms, and `dueOf(store, graph, now)` the nodes due.
+
+```ts
+import { DAY, dueOf, isDue, nextReview } from 'learn-kit/graph';
+
+const now = Date.UTC(2026, 9, 8, 9);
+const first = nextReview(undefined, true, now); // { step: 0, due: now + DAY, lastWhen: now, lapses: 0, rights: 1 }
+const second = nextReview(first, true, now + DAY); // { step: 1, due: now + 4 * DAY, lastWhen: now + DAY, lapses: 0, rights: 0 }
+isDue(second, now + 4 * DAY); // true
+nextReview(second, false, now + 4 * DAY); // { step: 0, due: now + 5 * DAY, lastWhen: now + 4 * DAY, lapses: 1, rights: 0 }
+(await dueOf(store, graph, Date.now() + DAY)).map((n) => n.id); // ['multiply']: being learned, due after the first gap
+```

@@ -6,7 +6,7 @@ version of them. MIT licensed.
 
 | Library | What it is | Status |
 | --- | --- | --- |
-| [`@learn-kit/graph`](packages/graph/README.md) (`learn-kit/graph`) | The learning graph. | Nodes and needs, validation, topological order, levels and an injected store; the frontier and the review schedule to come. |
+| [`@learn-kit/graph`](packages/graph/README.md) (`learn-kit/graph`) | The learning graph. | Nodes and needs, validation, topological order, levels and an injected store; the frontier, solid and tested out, and the review schedule. |
 
 ## Install
 
