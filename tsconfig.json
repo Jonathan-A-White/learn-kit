@@ -6,7 +6,8 @@
     "types": ["node"],
     "baseUrl": ".",
     "paths": {
-      "learn-kit/graph": ["packages/graph/src/index.ts"]
+      "learn-kit/graph": ["packages/graph/src/index.ts"],
+      "learn-kit/drill": ["packages/drill/src/index.ts"]
     }
   },
   "include": ["packages/*/src", "packages/*/tests", "tests", "vitest.config.ts", "eslint.config.js"],

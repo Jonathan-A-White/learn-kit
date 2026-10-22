@@ -1,0 +1,19 @@
+{
+  "name": "@learn-kit/drill",
+  "version": "0.1.0",
+  "description": "learn-kit: the drill engine (a walk to the gap, a plan for it, pluggable drill forms, a sitting's mix of the frontier and due reviews) and the placement test that finds where a learner is on any graph; no React, no Dexie, no subject.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist/**",
+    "!**/*.tsbuildinfo"
+  ]
+}

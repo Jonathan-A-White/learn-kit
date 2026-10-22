@@ -5,6 +5,7 @@ export default defineConfig({
   resolve: {
     alias: {
       'learn-kit/graph': fileURLToPath(new URL('./packages/graph/src/index.ts', import.meta.url)),
+      'learn-kit/drill': fileURLToPath(new URL('./packages/drill/src/index.ts', import.meta.url)),
     },
   },
   test: {

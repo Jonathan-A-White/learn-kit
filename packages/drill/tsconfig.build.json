@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "types": [],
+    "declaration": true,
+    "rootDir": "src",
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/.tsbuildinfo",
+    "baseUrl": ".",
+    "paths": {
+      "learn-kit/graph": ["../graph/dist/index.d.ts"]
+    }
+  },
+  "include": ["src"],
+  "references": [{ "path": "../graph/tsconfig.build.json" }]
+}
