@@ -6,7 +6,7 @@ version of them. MIT licensed.
 
 | Library | What it is | Status |
 | --- | --- | --- |
-| [`@learn-kit/graph`](packages/graph/README.md) (`learn-kit/graph`) | The learning graph. | Empty: it builds and exports one placeholder until the graph is carved into it. |
+| [`@learn-kit/graph`](packages/graph/README.md) (`learn-kit/graph`) | The learning graph. | Nodes and needs, validation, topological order, levels and an injected store; the frontier and the review schedule to come. |
 
 ## Install
 

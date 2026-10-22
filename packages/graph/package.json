@@ -1,7 +1,7 @@
 {
   "name": "@learn-kit/graph",
-  "version": "0.1.0",
-  "description": "learn-kit: the learning graph. Empty until it is carved; no React, no Dexie, no subject.",
+  "version": "0.2.0",
+  "description": "learn-kit: the learning graph: nodes and needs, validation, topological order, levels and an injected store; no React, no Dexie, no subject.",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
