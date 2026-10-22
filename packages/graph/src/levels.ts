@@ -40,10 +40,14 @@ export async function levelOf(store: GraphStore, id: string): Promise<Level> {
   return (await store.get(id))?.level ?? 'notYet';
 }
 
-/** Sets a node's level in the store, with when (`now`, ms) and what set it (`how`: 'review', 'tested-out' ...). Throws, writing nothing, on a node the graph does not have. */
+/**
+ * Sets a node's level in the store, with when (`now`, ms) and what set it (`how`: 'review', 'tested-out' ...), keeping the node's review
+ * schedule. Throws, writing nothing, on a node the graph does not have. It keeps no rule of the frontier: frontier.ts's writers do.
+ */
 export async function setLevel(store: GraphStore, graph: Graph, id: string, level: Level, how: string, now: number = Date.now()): Promise<void> {
   nodeOf(graph, id);
-  await store.put(id, { level, since: now, how });
+  const review = (await store.get(id))?.review;
+  await store.put(id, review ? { level, since: now, how, review } : { level, since: now, how });
 }
 
 /** The level of every node of the graph, in the graph's order: not yet for a node with no state; the store's states of nodes the graph does not have are left out. */
