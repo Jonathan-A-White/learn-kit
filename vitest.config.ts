@@ -9,6 +9,6 @@ export default defineConfig({
   },
   test: {
     environment: 'node',
-    include: ['packages/*/tests/**/*.test.{ts,tsx}', 'scripts/*.test.mjs'],
+    include: ['packages/*/tests/**/*.test.{ts,tsx}', 'tests/*.test.ts', 'scripts/*.test.mjs'],
   },
 });

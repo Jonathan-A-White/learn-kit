@@ -9,6 +9,6 @@
       "learn-kit/graph": ["packages/graph/src/index.ts"]
     }
   },
-  "include": ["packages/*/src", "packages/*/tests", "vitest.config.ts", "eslint.config.js"],
+  "include": ["packages/*/src", "packages/*/tests", "tests", "vitest.config.ts", "eslint.config.js"],
   "exclude": ["**/dist"]
 }
