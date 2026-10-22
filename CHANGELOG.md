@@ -5,6 +5,16 @@ Newest first. Breaking changes come first in a release, each with its migration 
 Each library keeps its own changelog; this one records the repo's releases and points at them:
 
 - [@learn-kit/graph](packages/graph/CHANGELOG.md)
+- [@learn-kit/drill](packages/drill/CHANGELOG.md)
+
+## 0.1.4 (2026-10-22, not yet tagged)
+
+- New: `@learn-kit/drill` 0.1.0 (`learn-kit/drill`), the drill engine and the placement (mw-79en7t.3): the drill walk and the plan
+  for a gap, drill forms an app registers, a sitting's mix of the frontier and the reviews due, and the placement that bisects
+  over the graph's levels and marks what a learner passes tested out. The commit that lands it is the one apps pin.
+- Changed: the consumer smoke test also installs and imports `learn-kit/drill`, and lets it import `learn-kit/graph` and nothing
+  else of the kit.
+- Package versions: graph 0.3.0, drill 0.1.0.
 
 ## 0.1.3 (2026-10-22, not yet tagged)
 

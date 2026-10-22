@@ -7,6 +7,7 @@ version of them. MIT licensed.
 | Library | What it is | Status |
 | --- | --- | --- |
 | [`@learn-kit/graph`](packages/graph/README.md) (`learn-kit/graph`) | The learning graph. | Nodes and needs, validation, topological order, levels and an injected store; the frontier, solid and tested out, and the review schedule. |
+| [`@learn-kit/drill`](packages/drill/README.md) (`learn-kit/drill`) | The drill engine and the placement. | The drill walk and plan for a gap, drill forms, a sitting's mix of the frontier and due reviews, and the placement that marks what a learner passes tested out. |
 
 ## Install
 
@@ -18,9 +19,10 @@ npm install github:Jonathan-A-White/learn-kit#<full commit SHA>
 
 ```ts
 import { GRAPH_PACKAGE } from 'learn-kit/graph';
+import { DRILL_PACKAGE } from 'learn-kit/drill';
 ```
 
-The root `package.json` maps each entry point (`learn-kit/graph`, ...) onto a package's `dist/` folder; there are no deep
+The root `package.json` maps each entry point (`learn-kit/graph`, `learn-kit/drill`) onto a package's `dist/` folder; there are no deep
 imports. Apps install by tag or by full commit SHA, never by branch. On npm 11 the install's `prepare` script may need
 `allowScripts` for the package.
 
@@ -34,7 +36,7 @@ npm ci --no-audit --no-fund && npm run lint && npm run typecheck && npm test && 
 
 `npm test` runs every package's tests, the check that no tracked file holds anything personal
 (`npm run check:personal`) and the consumer smoke test (`npm run smoke`): it installs the repo by commit into a scratch app
-and imports `learn-kit/graph` from there. The smoke test needs the network or a warm npm cache; `LEARN_KIT_SKIP_SMOKE=1`
+and imports `learn-kit/graph` and `learn-kit/drill` from there. The smoke test needs the network or a warm npm cache; `LEARN_KIT_SKIP_SMOKE=1`
 leaves it out offline.
 
 ## Layout
