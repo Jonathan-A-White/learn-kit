@@ -1,6 +1,6 @@
 {
   "name": "learn-kit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "The learning graph, levels, schedule, drills and learner profile shared by Lampas and Kestrel, as small framework-free libraries: @learn-kit/graph (empty until it is carved).",
   "license": "MIT",
   "type": "module",
