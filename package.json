@@ -1,0 +1,46 @@
+{
+  "name": "learn-kit",
+  "version": "0.1.0",
+  "description": "The learning graph, levels, schedule, drills and learner profile shared by Lampas and Kestrel, as small framework-free libraries: @learn-kit/graph (empty until it is carved).",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jonathan-A-White/learn-kit.git"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "exports": {
+    "./graph": {
+      "types": "./packages/graph/dist/index.d.ts",
+      "default": "./packages/graph/dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "packages/*/dist/**",
+    "packages/*/package.json",
+    "!**/*.tsbuildinfo"
+  ],
+  "scripts": {
+    "build": "tsc -b packages/graph/tsconfig.build.json",
+    "prepare": "npm run build",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run check:personal && vitest run",
+    "check:personal": "node scripts/check-personal.mjs",
+    "smoke": "bash scripts/consumer-smoke.sh"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/node": "^20.19.0",
+    "eslint": "^9.39.1",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.48.0",
+    "vitest": "^4.0.18"
+  }
+}
