@@ -37,6 +37,19 @@ describe('memoryStore', () => {
     expect(await store.get('count')).toEqual(SOLID);
   });
 
+  it('keeps copies of a review schedule too: changing the one put or got changes nothing stored', async () => {
+    const review = { step: 1, due: 2_000, lastWhen: 1_000, lapses: 0, rights: 1 };
+    const store = memoryStore([['count', { ...SOLID, review }]]);
+    review.step = 5;
+    (await store.get('count'))!.review!.step = 5;
+    (await store.entries()).get('count')!.review!.step = 5;
+    const put = { ...SOLID, review: { ...review, step: 2 } };
+    await store.put('add', put);
+    put.review.step = 5;
+    expect((await store.get('count'))?.review?.step).toBe(1);
+    expect((await store.get('add'))?.review?.step).toBe(2);
+  });
+
   it('keeps each store to itself: two stores do not see each other', async () => {
     const mine = memoryStore();
     const yours = memoryStore();
@@ -57,6 +70,13 @@ describe('levels through a store', () => {
     await setLevel(store, GRAPH, 'multiply', 'solid', 'tested-out', 5_000);
     expect(await store.get('multiply')).toEqual({ level: 'solid', since: 5_000, how: 'tested-out' });
     expect(await levelOf(store, 'multiply')).toBe('solid');
+  });
+
+  it('keeps the node review schedule when it sets the level', async () => {
+    const review = { step: 2, due: 9_000, lastWhen: 4_000, lapses: 1, rights: 1 };
+    const store = memoryStore([['add', { level: 'frontier', since: 1, how: 'review', review }]]);
+    await setLevel(store, GRAPH, 'add', 'notYet', 'sheet', 5_000);
+    expect(await store.get('add')).toEqual({ level: 'notYet', since: 5_000, how: 'sheet', review });
   });
 
   it('refuses a node the graph does not have, writing nothing', async () => {
@@ -82,7 +102,7 @@ describe('levels through a store', () => {
     await setLevel(watched, GRAPH, 'add', 'solid', 'review', 1);
     expect(await levelOf(watched, 'add')).toBe('solid');
     expect(await levelsOf(watched, GRAPH)).toEqual(new Map([['count', 'notYet'], ['add', 'solid'], ['multiply', 'notYet']]));
-    expect(calls).toEqual(['put add', 'get add', 'entries']);
+    expect(calls).toEqual(['get add', 'put add', 'get add', 'entries']);
   });
 });
 
