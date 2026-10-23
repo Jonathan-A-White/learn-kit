@@ -7,6 +7,16 @@ Each library keeps its own changelog; this one records the repo's releases and p
 - [@learn-kit/graph](packages/graph/CHANGELOG.md)
 - [@learn-kit/drill](packages/drill/CHANGELOG.md)
 - [@learn-kit/learner](packages/learner/CHANGELOG.md)
+- [@learn-kit/recall](packages/recall/CHANGELOG.md)
+
+## 0.1.7 (2026-10-23, not yet tagged)
+
+- New: `@learn-kit/recall` 0.1.0 (`learn-kit/recall`), saying a text from memory (mw-fu7dqf.2): `fold` and `foldWords`, the folding
+  Lampas wrote twice as one; `matchSequence`, the words of a target heard in order against what was said (score, hits, misses by
+  index, extras, passing at 90% by default); and `hideWords`, which words of a target a rung hides, spread evenly and seeded. The
+  commit that lands it is the one apps pin.
+- Changed: the consumer smoke test also installs and imports `learn-kit/recall`, and lets it import no other kit library.
+- Package versions: graph 0.3.0, drill 0.1.0, learner 0.1.0, recall 0.1.0.
 
 ## 0.1.6 (2026-10-22, not yet tagged)
 

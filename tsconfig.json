@@ -8,7 +8,8 @@
     "paths": {
       "learn-kit/graph": ["packages/graph/src/index.ts"],
       "learn-kit/drill": ["packages/drill/src/index.ts"],
-      "learn-kit/learner": ["packages/learner/src/index.ts"]
+      "learn-kit/learner": ["packages/learner/src/index.ts"],
+      "learn-kit/recall": ["packages/recall/src/index.ts"]
     }
   },
   "include": ["packages/*/src", "packages/*/tests", "tests", "vitest.config.ts", "eslint.config.js"],

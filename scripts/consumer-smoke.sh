@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # The consumer smoke test: installs learn-kit the way an app does, `npm install git+file://<a fresh clone>`, into a scratch
 # directory, and checks from there what a git install must deliver:
-#   - the exports map names the entry points (learn-kit/graph, learn-kit/drill, learn-kit/learner) and package.json, nothing else;
+#   - the exports map names the entry points (learn-kit/graph, learn-kit/drill, learn-kit/learner, learn-kit/recall) and package.json, nothing else;
 #   - each is packed and imports; the graph's import graph reaches no other learn-kit library, React or Dexie, and the drill's and the
-#     learner's reach no learn-kit library but learn-kit/graph, no React and no Dexie.
+#     learner's reach no learn-kit library but learn-kit/graph, and the recall's reaches none; none reaches React or Dexie.
 # The "fresh clone" is the working tree as it stands (tracked and untracked files, minus what git ignores), committed into a
 # scratch repository, so an edit not yet committed is smoke-tested too.
 # Run: npm run smoke   (needs the network or a warm npm cache: the install runs the build with devDependencies)
@@ -36,7 +36,7 @@ echo '{ "name": "smoke-app", "private": true, "type": "module" }' > "$app/packag
 echo 'installing learn-kit from a fresh clone ...'
 (cd "$app" && npm install --no-audit --no-fund "git+file://$clone" > "$scratch/install.log" 2>&1) || { cat "$scratch/install.log" >&2; exit 1; }
 
-# 3. The exports map, the packed files, and 'learn-kit/graph', 'learn-kit/drill' and 'learn-kit/learner' imported by an app.
+# 3. The exports map, the packed files, and 'learn-kit/graph', 'learn-kit/drill', 'learn-kit/learner' and 'learn-kit/recall' imported by an app.
 cat > "$app/graph.mjs" <<'JS'
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
@@ -44,15 +44,16 @@ import { createRequire } from 'node:module';
 import { GRAPH_PACKAGE } from 'learn-kit/graph';
 import { DRILL_PACKAGE } from 'learn-kit/drill';
 import { LEARNER_PACKAGE } from 'learn-kit/learner';
+import { RECALL_PACKAGE } from 'learn-kit/recall';
 
 const installed = join(process.cwd(), 'node_modules', 'learn-kit');
 
 // The exports map names the entry points (and package.json), nothing else: no deep imports.
 const entries = Object.keys(JSON.parse(readFileSync(join(installed, 'package.json'), 'utf-8')).exports).sort();
-if (JSON.stringify(entries) !== JSON.stringify(['./drill', './graph', './learner', './package.json'])) throw new Error('exports: ' + entries.join(', '));
+if (JSON.stringify(entries) !== JSON.stringify(['./drill', './graph', './learner', './package.json', './recall'])) throw new Error('exports: ' + entries.join(', '));
 console.log('the exports map names the entry points');
 
-for (const lib of ['graph', 'drill', 'learner']) {
+for (const lib of ['graph', 'drill', 'learner', 'recall']) {
   for (const file of ['index.js', 'index.d.ts']) {
     if (!existsSync(join(installed, 'packages', lib, 'dist', file))) throw new Error(`packages/${lib}/dist/${file} is not packed`);
   }
@@ -74,6 +75,7 @@ const walk = (file, allowed, seen = new Set()) => {
 walk(createRequire(import.meta.url).resolve('learn-kit/graph'), []);
 walk(createRequire(import.meta.url).resolve('learn-kit/drill'), ['learn-kit/graph']);
 walk(createRequire(import.meta.url).resolve('learn-kit/learner'), ['learn-kit/graph']);
+walk(createRequire(import.meta.url).resolve('learn-kit/recall'), []);
 
 if (GRAPH_PACKAGE !== '@learn-kit/graph') throw new Error('GRAPH_PACKAGE: ' + GRAPH_PACKAGE);
 console.log('learn-kit/graph imports');
@@ -81,6 +83,8 @@ if (DRILL_PACKAGE !== '@learn-kit/drill') throw new Error('DRILL_PACKAGE: ' + DR
 console.log('learn-kit/drill imports');
 if (LEARNER_PACKAGE !== '@learn-kit/learner') throw new Error('LEARNER_PACKAGE: ' + LEARNER_PACKAGE);
 console.log('learn-kit/learner imports');
+if (RECALL_PACKAGE !== '@learn-kit/recall') throw new Error('RECALL_PACKAGE: ' + RECALL_PACKAGE);
+console.log('learn-kit/recall imports');
 JS
 (cd "$app" && node graph.mjs)
 echo 'consumer smoke test passed'

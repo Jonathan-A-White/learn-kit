@@ -7,6 +7,7 @@ export default defineConfig({
       'learn-kit/graph': fileURLToPath(new URL('./packages/graph/src/index.ts', import.meta.url)),
       'learn-kit/drill': fileURLToPath(new URL('./packages/drill/src/index.ts', import.meta.url)),
       'learn-kit/learner': fileURLToPath(new URL('./packages/learner/src/index.ts', import.meta.url)),
+      'learn-kit/recall': fileURLToPath(new URL('./packages/recall/src/index.ts', import.meta.url)),
     },
   },
   test: {
