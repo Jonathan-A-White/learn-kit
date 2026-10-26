@@ -1,6 +1,6 @@
 {
   "name": "learn-kit",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "The learning graph, levels, schedule, drills and learner profile shared by Lampas and Kestrel, as small framework-free libraries: @learn-kit/graph (nodes and needs, order, levels and a store, the frontier and the review schedule), @learn-kit/drill (the drill walk, forms, a sitting's mix and the placement), @learn-kit/learner (the learner profile, a goal and its scaffolding) and @learn-kit/recall (saying a text from memory: fold, the words of a text, matching what was said against a target, and which words a rung hides).",
   "license": "MIT",
   "type": "module",

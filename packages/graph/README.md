@@ -139,8 +139,13 @@ await testOut(store, graph, 'add');
 
 The gaps are `STEP_DAYS`, 1, 3, 7, 14, 30 and 60 days, then a rare check every 90 (`RARE_CHECK_DAYS`). Right twice in a row moves a
 node up a step, a single right keeps its step, and one wrong drops it two steps and makes it due tomorrow. `nextReview(schedule,
-right, now)` is the schedule after one answer (`undefined` for a node not scheduled yet), `isDue(schedule, now)` whether it is due,
+answer, now)` is the schedule after one answer (`undefined` for a node not scheduled yet), `isDue(schedule, now)` whether it is due,
 `gapOf(step)` a step's gap in ms, and `dueOf(store, graph, now)` the nodes due.
+
+An answer is a `Grade` (`'well' | 'some' | 'not'`) or a boolean. `'well'` (knows it well) moves the node up a step at once, due after
+that step's gap, with its rights back to 0. `'some'` (kind of knows it) is a right: two in a row move it up a step, a single one
+keeps its step. `'not'` (does not know it) is a wrong: two steps down, due tomorrow, a lapse. A boolean keeps its old meaning,
+`true` is `'some'` and `false` is `'not'`, so a caller that passes one is unchanged.
 
 ```ts
 import { DAY, dueOf, isDue, nextReview } from 'learn-kit/graph';
@@ -148,6 +153,7 @@ import { DAY, dueOf, isDue, nextReview } from 'learn-kit/graph';
 const now = Date.UTC(2026, 9, 8, 9);
 const first = nextReview(undefined, true, now); // { step: 0, due: now + DAY, lastWhen: now, lapses: 0, rights: 1 }
 const second = nextReview(first, true, now + DAY); // { step: 1, due: now + 4 * DAY, lastWhen: now + DAY, lapses: 0, rights: 0 }
+nextReview(first, 'well', now + DAY); // { step: 1, due: now + 4 * DAY, lastWhen: now + DAY, lapses: 0, rights: 0 }: up a step at once
 isDue(second, now + 4 * DAY); // true
 nextReview(second, false, now + 4 * DAY); // { step: 0, due: now + 5 * DAY, lastWhen: now + 4 * DAY, lapses: 1, rights: 0 }
 (await dueOf(store, graph, Date.now() + DAY)).map((n) => n.id); // ['multiply']: being learned, due after the first gap

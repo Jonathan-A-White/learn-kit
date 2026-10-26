@@ -2,6 +2,13 @@
 
 Newest first. Breaking changes come first in a release, each with its migration in one sentence.
 
+## 0.4.0 (2026-10-26)
+
+- New: `nextReview` takes a grade as well as a boolean (mw-5r3p30.786): `Grade` is `'well'` (knows it well: up a step at once, due after
+  that step's gap, rights back to 0), `'some'` (kind of knows it: today's right, two in a row move it up a step) or `'not'` (does
+  not know it: today's wrong, two steps down, due tomorrow, a lapse). A boolean keeps its meaning (`true` is `'some'`, `false` is
+  `'not'`), so no caller changes.
+
 ## 0.3.0 (2026-10-22)
 
 - New: the frontier and solid, carved from Lampas (mw-79en7t.27): `frontierOf` (the nodes not solid whose every need is solid) and,
