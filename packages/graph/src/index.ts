@@ -19,6 +19,7 @@ export {
   knownSchedule,
   nextReview,
   startSchedule,
+  type Grade,
   type Schedule,
 } from './schedule.js';
 export {

@@ -12,6 +12,8 @@ export const DAY = 24 * 60 * 60 * 1000;
  * - Right twice in a row (`rights` counts the rights since the last advance or wrong) moves it up one step; a single right keeps its
  *   step and it comes back after that step's gap.
  * - One wrong drops it two steps (never below step 0), counts a lapse, and it is due tomorrow.
+ * - An answer may also be graded: 'well' (knows it well) moves it up one step at once, 'some' (kind of knows it) is a right, and
+ *   'not' (does not know it) is a wrong; a boolean is 'some' (true) or 'not' (false).
  * - Past the last step (step === STEP_DAYS.length) it is a rare check, due again every RARE_CHECK_DAYS days.
  */
 export const STEP_DAYS = Object.freeze([1, 3, 7, 14, 30, 60] as const);
@@ -27,6 +29,9 @@ export const KNOWN_STEP = STEP_DAYS.indexOf(30);
 
 /** A wrong answer drops a node this many steps. */
 const DROP_STEPS = 2;
+
+/** How well the learner knew a node: 'well' moves it up a step at once, 'some' is a right (two in a row move it up), 'not' is a wrong. */
+export type Grade = 'well' | 'some' | 'not';
 
 /** A node's place on the schedule. */
 export interface Schedule {
@@ -47,15 +52,19 @@ export function gapOf(step: number): number {
   return (step >= RARE_STEP ? RARE_CHECK_DAYS : STEP_DAYS[step]) * DAY;
 }
 
-/** The schedule of a node after one answer at `now`; `review` is undefined for a node not scheduled yet. */
-export function nextReview(review: Schedule | undefined, right: boolean, now: number): Schedule {
+/**
+ * The schedule of a node after one answer at `now`; `review` is undefined for a node not scheduled yet. `answer` is a Grade, or a
+ * boolean (true is 'some', false is 'not').
+ */
+export function nextReview(review: Schedule | undefined, answer: boolean | Grade, now: number): Schedule {
+  const grade: Grade = typeof answer === 'string' ? answer : answer ? 'some' : 'not';
   const step = review?.step ?? 0;
   const lapses = review?.lapses ?? 0;
-  if (!right) {
+  if (grade === 'not') {
     return { step: Math.max(0, step - DROP_STEPS), due: now + DAY, lastWhen: now, lapses: lapses + 1, rights: 0 };
   }
   const rights = (review?.rights ?? 0) + 1;
-  const advance = rights >= 2;
+  const advance = grade === 'well' || rights >= 2;
   const to = advance ? Math.min(step + 1, RARE_STEP) : step;
   return { step: to, due: now + gapOf(to), lastWhen: now, lapses, rights: advance ? 0 : rights };
 }

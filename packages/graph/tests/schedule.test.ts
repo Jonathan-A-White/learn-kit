@@ -14,6 +14,7 @@ import {
   levelFromStep,
   nextReview,
   startSchedule,
+  type Grade,
   type Schedule,
 } from '../src/index.js';
 
@@ -111,5 +112,53 @@ describe('the gaps and the starts', () => {
     expect(levelFromStep(SOLID_STEP)).toBe('solid');
     expect(levelFromStep(KNOWN_STEP)).toBe('solid');
     expect(levelFromStep(RARE_STEP)).toBe('solid');
+  });
+});
+
+describe('the grades', () => {
+  const steps = Array.from({ length: RARE_STEP + 1 }, (_, step) => step);
+
+  it('moves a node knowing it well up a step at once, due after that step\'s gap, rights back to 0', () => {
+    for (const step of steps) {
+      for (const rights of [0, 1]) {
+        const to = Math.min(step + 1, RARE_STEP);
+        expect(nextReview(review(step, { rights, lapses: 2 }), 'well', NOW)).toEqual({ step: to, due: NOW + gapOf(to), lastWhen: NOW, lapses: 2, rights: 0 });
+      }
+    }
+    expect(nextReview(review(RARE_STEP), 'well', NOW).due).toBe(at(90));
+  });
+
+  it('starts a node not scheduled yet at step 1 when it is known well', () => {
+    expect(nextReview(undefined, 'well', NOW)).toEqual({ step: 1, due: at(3), lastWhen: NOW, lapses: 0, rights: 0 });
+  });
+
+  it('treats kind of knowing it as a right, and not knowing it as a wrong, at every step', () => {
+    for (const step of steps) {
+      for (const rights of [0, 1]) {
+        const r = review(step, { rights, lapses: 1 });
+        expect(nextReview(r, 'some', NOW)).toEqual(nextReview(r, true, NOW));
+        expect(nextReview(r, 'not', NOW)).toEqual(nextReview(r, false, NOW));
+      }
+    }
+    expect(nextReview(undefined, 'some', NOW)).toEqual(nextReview(undefined, true, NOW));
+    expect(nextReview(undefined, 'not', NOW)).toEqual(nextReview(undefined, false, NOW));
+  });
+
+  it('advances one step on two kind-of answers in a row', () => {
+    const first = nextReview(review(2), 'some', NOW);
+    expect(first).toMatchObject({ step: 2, due: at(7), rights: 1 });
+    const second = nextReview(first, 'some', at(7));
+    expect(second).toMatchObject({ step: 3, due: at(7) + 14 * DAY, rights: 0 });
+  });
+
+  it('does not count a kind-of across a not, and lets well follow a kind-of', () => {
+    const a = nextReview(review(3, { rights: 1 }), 'not', NOW);
+    expect(nextReview(a, 'some', NOW)).toMatchObject({ step: 1, rights: 1 });
+    expect(nextReview(review(1, { rights: 1 }), 'well', NOW)).toMatchObject({ step: 2, rights: 0 });
+  });
+
+  it('names the three grades', () => {
+    const grades: Grade[] = ['well', 'some', 'not'];
+    expect(grades.map((g) => nextReview(review(1), g, NOW).step)).toEqual([2, 1, 0]);
   });
 });
