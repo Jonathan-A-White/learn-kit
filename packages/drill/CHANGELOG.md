@@ -2,6 +2,14 @@
 
 Newest first. Breaking changes come first in a release, each with its migration in one sentence.
 
+## 0.3.0 (2026-10-27)
+
+- New: `ItemAsk.avoid` (mw-dglxgdz.2). When `planDrill` is given `fresh` (a `FreshStore` of `learn-kit/fresh`, or anything with
+  `getAsked(idea)`), each node's asked keys go to the item maker as `avoid`, so it makes none of them again. Without `fresh` the ask has no
+  `avoid`, and a maker that ignores it is unchanged.
+- New: `stockThenMaker(stock, maker)`: an `ItemMaker` that takes up to `ask.count` items from the stock (a `Stock` of `learn-kit/fresh`) first,
+  oldest first, and fills the rest from the maker, so an app's draw is one line.
+
 ## 0.2.0 (2026-10-27)
 
 - New: `WalkOptions.isFresh(key)` (mw-dglxgdz.1). When given, a right answer on a key that is not fresh neither counts toward

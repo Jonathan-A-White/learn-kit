@@ -95,6 +95,10 @@ stated mix, each node once. `mix` is the proportion `{ frontier, due }` (`DEFAUL
 items of each and refuses any in a form the registry does not hold. The plan is `{ entries: [{ nodeId, role, items }], items }`, the
 frontier and the reviews alternating.
 
+Given `fresh` (a `FreshStore` of `learn-kit/fresh`, or anything with `getAsked(idea)`), the plan tells the maker the keys already asked on
+each node in `ask.avoid`; a maker may ignore it. `stockThenMaker(stock, maker)` makes an `ItemMaker` that takes from an ask-ahead
+`Stock` first and fills the rest from `maker`: `planDrill({ ..., make: stockThenMaker(stock, makeItems), fresh })`.
+
 ### the walk
 
 For one node, `numberSteps(rawSteps, forms)` numbers the app's questions in steps of rising difficulty, each question tagged with a

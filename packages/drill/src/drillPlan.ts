@@ -22,6 +22,13 @@ export const DEFAULT_ITEMS_PER_NODE = 2;
 export interface ItemAsk {
   count: number;
   seed: number;
+  /** the question keys already asked on the node (its ledger), which the maker is not to make again; given only when the plan is given a ledger. A maker may ignore it. */
+  avoid?: string[];
+}
+
+/** Where the plan reads a node's asked keys from: a `FreshStore` of `learn-kit/fresh` is one. */
+export interface AskedKeys {
+  getAsked(idea: string): Promise<readonly string[]>;
 }
 
 /** The app's item maker: items for a node (about the node, in some registered form). It may be asynchronous. */
@@ -55,6 +62,8 @@ export interface PlanOptions<P> {
   itemsPerNode?: number;
   /** the items' seed */
   seed?: number;
+  /** the ledger of asked questions (a `FreshStore`): each node's asked keys go to the maker as `avoid` */
+  fresh?: AskedKeys;
   /** ms since the epoch; the reviews due by then are taken (now) */
   now?: number;
 }
@@ -106,9 +115,29 @@ export async function planDrill<P>(options: PlanOptions<P>): Promise<DrillPlan<P
   const entries: PlanEntry<P>[] = [];
   for (const [index, { id, role }] of chosen.entries()) {
     const node = graph.byId.get(id)!;
-    const made = await make(node, { count: per, seed: ((options.seed ?? 0) + index * 7919) >>> 0 });
+    const ask: ItemAsk = { count: per, seed: ((options.seed ?? 0) + index * 7919) >>> 0 };
+    if (options.fresh) ask.avoid = [...(await options.fresh.getAsked(id))];
+    const made = await make(node, ask);
     checkItems(forms, made);
     entries.push({ nodeId: id, role, items: made.map((item): DrillItem<P> => ({ ...item, nodeId: id })) });
   }
   return { entries, items: entries.flatMap((e) => e.items) };
+}
+
+/**
+ * An item maker that serves the stock first and makes the rest: it takes up to `ask.count` items for the node's id from `stock` (oldest first, each
+ * once; a `Stock` of `learn-kit/fresh` is one), then asks `maker` for the others, with the same seed and keys to avoid. A draw that the stock fills
+ * never calls the maker. The stock's own top-up is the app's to start (`opened`), not this helper's.
+ */
+export function stockThenMaker<P>(stock: { take(idea: string): MadeItem<P> | undefined | Promise<MadeItem<P> | undefined> }, maker: ItemMaker<P>): ItemMaker<P> {
+  return async (node, ask) => {
+    const items: MadeItem<P>[] = [];
+    while (items.length < ask.count) {
+      const kept = await stock.take(node.id);
+      if (!kept) break;
+      items.push(kept);
+    }
+    if (items.length === ask.count) return items;
+    return [...items, ...(await maker(node, { ...ask, count: ask.count - items.length }))];
+  };
 }

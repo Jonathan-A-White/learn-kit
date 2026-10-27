@@ -2,7 +2,7 @@
 // the items each is asked by, every item in a form the app has registered.
 import { memoryStore, testOut, teach, review, type GraphStore } from 'learn-kit/graph';
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_MIX, DrillFormError, planDrill, type ItemMaker } from '../src/index.js';
+import { DEFAULT_MIX, DrillFormError, planDrill, stockThenMaker, type ItemAsk, type ItemMaker } from '../src/index.js';
 import { FORMS, LADDER } from './fixtures.js';
 
 const NOW = Date.UTC(2026, 9, 12, 9, 0, 0);
@@ -103,5 +103,74 @@ describe('planDrill', () => {
     await expect(planDrill({ ...base, mix: { frontier: -1, due: 1 } })).rejects.toThrow(/mix/);
     await expect(planDrill({ ...base, mix: { frontier: 0, due: 0 } })).rejects.toThrow(/mix/);
     await expect(planDrill({ ...base, size: 2.5 })).rejects.toThrow(/size/);
+  });
+});
+
+describe('planDrill: the keys to avoid', () => {
+  it('passes the ledger keys of each node to the maker as avoid, when it is given a store of what was asked', async () => {
+    const seen: [string, ItemAsk][] = [];
+    const make: ItemMaker<string> = (node, ask) => {
+      seen.push([node.id, ask]);
+      return maker(node, ask);
+    };
+    const fresh = { getAsked: async (idea: string): Promise<readonly string[]> => (idea === 'a3' ? ['k1', 'k2'] : []) };
+    await planDrill({ graph: LADDER, store: await seeded(), forms: FORMS, make, size: 2, fresh, now: NOW });
+    expect(seen.map(([id]) => id)).toEqual(['a3', 'a0']);
+    expect(seen[0][1].avoid).toEqual(['k1', 'k2']);
+    expect(seen[1][1].avoid).toEqual([]);
+  });
+
+  it('leaves avoid off when it is given no such store, and a maker that ignores it is unchanged', async () => {
+    const asks: ItemAsk[] = [];
+    const make: ItemMaker<string> = (node, ask) => {
+      asks.push(ask);
+      return maker(node, ask);
+    };
+    const plain = await planDrill({ graph: LADDER, store: await seeded(), forms: FORMS, make, size: 2, now: NOW });
+    expect(asks.every((a) => !('avoid' in a))).toBe(true);
+    const withFresh = await planDrill({ graph: LADDER, store: await seeded(), forms: FORMS, make: maker, size: 2, fresh: { getAsked: async () => ['k'] }, now: NOW });
+    expect(withFresh.items).toEqual(plain.items);
+  });
+});
+
+describe('stockThenMaker', () => {
+  const kept = (...keys: string[]) => {
+    const list = keys.map((key) => ({ key, form: 'tap', payload: `kept ${key}` }));
+    return { take: async (): Promise<(typeof list)[number] | undefined> => list.shift() };
+  };
+
+  it('takes from the stock first, in its order, and fills the rest from the maker', async () => {
+    const asks: ItemAsk[] = [];
+    const make: ItemMaker<string> = (node, ask) => {
+      asks.push(ask);
+      return maker(node, ask);
+    };
+    const plan = await planDrill({ graph: LADDER, store: await seeded(), forms: FORMS, make: stockThenMaker(kept('k1'), make), size: 1, itemsPerNode: 3, now: NOW });
+    expect(plan.items.map((i) => i.key)).toEqual(['k1', 'a3#0', 'a3#1']);
+    expect(asks.map((a) => a.count)).toEqual([2]);
+  });
+
+  it('asks the maker for nothing when the stock fills the draw', async () => {
+    let called = 0;
+    const make: ItemMaker<string> = (node, ask) => {
+      called += 1;
+      return maker(node, ask);
+    };
+    const plan = await planDrill({ graph: LADDER, store: await seeded(), forms: FORMS, make: stockThenMaker(kept('k1', 'k2', 'k3'), make), size: 1, now: NOW });
+    expect(plan.items.map((i) => i.key)).toEqual(['k1', 'k2']);
+    expect(called).toBe(0);
+  });
+
+  it('passes the maker its seed and avoid, and takes by the node id', async () => {
+    const taken: string[] = [];
+    const stock = { take: (idea: string) => (taken.push(idea), undefined) };
+    let got: ItemAsk | undefined;
+    const make: ItemMaker<string> = (node, ask) => {
+      got = ask;
+      return maker(node, ask);
+    };
+    await stockThenMaker(stock, make)(LADDER.byId.get('a3')!, { count: 1, seed: 5, avoid: ['z'] });
+    expect(taken).toEqual(['a3']);
+    expect(got).toEqual({ count: 1, seed: 5, avoid: ['z'] });
   });
 });

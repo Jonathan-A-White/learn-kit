@@ -10,6 +10,14 @@ Each library keeps its own changelog; this one records the repo's releases and p
 - [@learn-kit/learner](packages/learner/CHANGELOG.md)
 - [@learn-kit/recall](packages/recall/CHANGELOG.md)
 
+## 0.1.10 (2026-10-27, not yet tagged)
+
+- New: `@learn-kit/fresh` 0.2.0, the ask-ahead stock (mw-dglxgdz.2): `createStock` keeps fresh items per idea over an injected `StockStore`,
+  serves the oldest once, and tops itself up in the background when an idea runs low (`opened`, `served`, `rightAfterMiss`), one ask in
+  flight, never awaited.
+- New: `@learn-kit/drill` 0.3.0, `ItemAsk.avoid` (the keys a maker is not to make again) and `stockThenMaker`.
+- Package versions: graph 0.4.0, drill 0.3.0, fresh 0.2.0, learner 0.1.0, recall 0.1.0.
+
 ## 0.1.9 (2026-10-27, not yet tagged)
 
 - New: `@learn-kit/fresh` 0.1.0 (`learn-kit/fresh`), proving on questions the learner has not seen (mw-dglxgdz.1): a ledger of the

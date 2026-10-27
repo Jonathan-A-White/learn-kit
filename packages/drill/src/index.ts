@@ -44,6 +44,8 @@ export {
   DEFAULT_MIX,
   DEFAULT_SIZE,
   planDrill,
+  stockThenMaker,
+  type AskedKeys,
   type DrillMix,
   type DrillPlan,
   type ItemAsk,

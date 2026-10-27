@@ -111,7 +111,7 @@ Each row of this table and the next is `| Where | Verdict | Why |`.
 
 ## Seen questions and confirming a missed idea (`learn-kit/fresh`)
 
-Added with `@learn-kit/fresh` 0.1.0 and `@learn-kit/drill` 0.2.0 (mw-dglxgdz.1). Lampas keeps these in the settings store and asks its
+Added with `@learn-kit/fresh` 0.1.0 and `@learn-kit/drill` 0.2.0 (mw-dglxgdz.1); the ask-ahead stock rows with `@learn-kit/fresh` 0.2.0 and `@learn-kit/drill` 0.3.0 (mw-dglxgdz.2). Lampas keeps these in the settings store and asks its
 mill for fresh questions; the kit holds the rule and the ledger over an injected `FreshStore`, and the app keeps the store, the rows
 and the asking.
 
@@ -124,6 +124,10 @@ and the asking.
 | `lampas/src/data/repositories/toConfirm.ts:73` | not-covered | `missedBefore` and the `confirmed` map read the idea's schedule row; the app reads its own rows and hands the answer to `recordAnswer` as `missedBefore`. |
 | `lampas/src/review/confirm.ts:32` | covered | `confirmAnswer`'s three cases are `recordAnswer`'s verdicts: fresh right is `known`, a seen right after a miss is `to-confirm`, a wrong answer is `missed`, any other right is `seen`. Writing the row, the hint check and `askForMoreItems` stay in Lampas. |
 | `lampas/src/data/grammar/drillIt.ts:50` | covered | The walk's `seen` option (a seen question never counts toward proving an idea) is `WalkOptions.isFresh`: a right answer on a seen key neither counts toward `PROVED_STREAK` nor breaks it. Lampas filters seen questions out of the steps (line 110) and checks the top step can still prove (line 126); the app may keep that, or pass `isFresh`. |
+| `lampas/src/review/moreItems.ts:71` | covered | `askForMoreItems`'s at-most-one-in-flight rule (`running`, a second call sharing it) is `topUp` of a `createStock` stock, and `whenIdle` is `settle`. The offline, no-key and no-licence checks, the mill request and the answer check are the app's `ask`, which resolves `[]` when it cannot ask; which ideas are fetchable, and the passage, stay in Lampas. |
+| `lampas/src/review/moreItems.ts:54` | covered | `LOW_KEPT` is `STOCK_LOW_WATER` (2), and `keepStocked` (line 121), called when a drill, a Review round or Prove it opens and when a kept item is served, is `opened` and `served`; `rightAfterMiss` is the trigger for the 'to-confirm' verdict. |
+| `lampas/src/data/repositories/fetchedItems.ts:31` | covered | `saveFetchedItems` keeps an idea's newest `MAX_KEPT` (6) after the ones kept: `topUp` and `STOCK_CAP`. The kept list in the settings store is the app's `StockStore`. |
+| `lampas/src/data/repositories/fetchedItems.ts:51` | covered | `takeFetchedItems` serves the oldest kept item once and drops one already asked: `take` of a `createStock` stock, given the ledger as `fresh`. `countFetchedItems` (line 43) and `listUnseenFetched` (line 73) are `count`. `takeAllFetched` (line 80) and the `served` set behind `isFreshQuestion` (line 17) stay in Lampas. |
 
 ## Hits of the sweep that are not a graph, a frontier or a scheduler
 
