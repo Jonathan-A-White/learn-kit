@@ -4,12 +4,15 @@ import { fileURLToPath } from 'node:url';
 import { validate, type Level } from 'learn-kit/graph';
 import { answerWalk, currentQuestion, numberSteps, resultOf, startWalk } from 'learn-kit/drill';
 import { expect, it } from 'vitest';
-import { LEDGER_CAP, MemoryFreshStore, asked, isFresh, isToConfirm, markAsked, recordAnswer, toConfirm } from '../src/index.js';
+import { LEDGER_CAP, STOCK_CAP, STOCK_LOW_WATER, MemoryFreshStore, MemoryStockStore, asked, createStock, isFresh, isToConfirm, markAsked, recordAnswer, toConfirm } from '../src/index.js';
 
 const README = fileURLToPath(new URL('../README.md', import.meta.url));
 
-it('names the provisional constant it holds', () => {
-  expect(readFileSync(README, 'utf-8')).toContain(`| \`LEDGER_CAP\` | ${LEDGER_CAP} |`);
+it('names the provisional constants it holds', () => {
+  const text = readFileSync(README, 'utf-8');
+  expect(text).toContain(`| \`LEDGER_CAP\` | ${LEDGER_CAP} |`);
+  expect(text).toContain(`| \`STOCK_CAP\` | ${STOCK_CAP} |`);
+  expect(text).toContain(`| \`STOCK_LOW_WATER\` | ${STOCK_LOW_WATER} |`);
 });
 
 it('runs the ledger example', async () => {
@@ -51,4 +54,24 @@ it('runs the walk example: seen keys do not prove, and the same walk on fresh ke
   };
   expect(run({ isFresh: (key) => !seen.has(key) })).toBe('limit');
   expect(run({ isFresh: () => true })).toBe('proved');
+});
+
+it('runs the stock example', async () => {
+  interface Item {
+    prompt: string;
+  }
+  const asks: { idea: string; count: number; avoid: string[] }[] = [];
+  const ask = async (idea: string, { count, avoid }: { count: number; avoid: string[] }): Promise<Item[]> => {
+    asks.push({ idea, count, avoid });
+    return ['one', 'two', 'three'].map((prompt) => ({ prompt }));
+  };
+  const stock = createStock<Item>({ ask, keyOf: (item) => item.prompt, store: new MemoryStockStore(), fresh: new MemoryFreshStore(), lowWater: 2, cap: 6 });
+  stock.opened('verbs');
+  await stock.settle();
+  expect(asks).toEqual([{ idea: 'verbs', count: 6, avoid: [] }]);
+  expect(await stock.take('verbs')).toEqual({ prompt: 'one' });
+  expect(stock.inFlight('verbs')).toBe(false);
+  stock.rightAfterMiss('verbs');
+  await stock.settle();
+  expect(asks[1].count).toBe(4);
 });

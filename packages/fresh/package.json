@@ -1,6 +1,6 @@
 {
   "name": "@learn-kit/fresh",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "learn-kit: proving on questions the learner has not seen: a capped ledger of the question keys asked on each idea, and the confirm-on-fresh rule (a right answer after a miss counts as known only when a fresh question is right), over an injected store; no React, no Dexie, no subject.",
   "license": "MIT",
   "type": "module",

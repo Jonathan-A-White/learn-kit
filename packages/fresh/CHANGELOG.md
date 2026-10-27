@@ -2,6 +2,15 @@
 
 Newest first. Breaking changes come first in a release, each with its migration in one sentence.
 
+## 0.2.0 (2026-10-27)
+
+- New: the ask-ahead stock (mw-dglxgdz.2), carved from Lampas's `moreItems.ts` and `fetchedItems.ts`. `createStock({ ask, keyOf, store, fresh?,
+  lowWater = 2, cap = 6 })` keeps fresh items per idea over an injected `StockStore` (`MemoryStockStore` for tests): `take` serves the oldest
+  once, `count`, `topUp(idea, avoid)` asks for `cap - kept` (never a key in `avoid`, in the ledger, kept already or repeated; one ask in flight
+  for the whole stock, a second call sharing its promise; a failed ask leaves the stock as it was) and `inFlight` says whether an ask runs.
+- New: the triggers, never awaited: `opened`, `served` (which `take` calls) and `rightAfterMiss` top up when an idea has fewer than `lowWater`
+  items, `rightAfterMiss` even when it has not. `settle()` is for tests. `STOCK_CAP` and `STOCK_LOW_WATER` are PROVISIONAL.
+
 ## 0.1.0 (2026-10-27)
 
 - New: the fresh library, carved from Lampas (mw-dglxgdz.1), over an injected `FreshStore`, with no React, no Dexie and no subject.

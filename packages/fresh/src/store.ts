@@ -51,3 +51,33 @@ export class MemoryFreshStore implements FreshStore {
     this.marked.delete(idea);
   }
 }
+
+/** The store the ask-ahead stock keeps its items in: the fresh items of each idea, oldest first. Asynchronous, so a database can stand behind it. */
+export interface StockStore<T> {
+  /** The items kept for the idea, oldest first; empty when none. */
+  get(idea: string): Promise<readonly T[]>;
+  /** Puts the idea's items, oldest first, in place of any it had. */
+  put(idea: string, items: readonly T[]): Promise<void>;
+}
+
+/** What a MemoryStockStore starts from. */
+export interface MemoryStockInitial<T> {
+  kept?: Iterable<readonly [string, readonly T[]]>;
+}
+
+/** A stock store in memory, for tests. Each is its own, and it keeps copies of the lists it is given and gives. */
+export class MemoryStockStore<T> implements StockStore<T> {
+  private readonly items = new Map<string, T[]>();
+
+  constructor(initial: MemoryStockInitial<T> = {}) {
+    for (const [idea, kept] of initial.kept ?? []) this.items.set(idea, [...kept]);
+  }
+
+  async get(idea: string): Promise<readonly T[]> {
+    return [...(this.items.get(idea) ?? [])];
+  }
+
+  async put(idea: string, items: readonly T[]): Promise<void> {
+    this.items.set(idea, [...items]);
+  }
+}
