@@ -75,6 +75,11 @@ export interface WalkOptions {
   provedStreak?: number;
   /** ids of facets that must each be answered right, unhinted, before the node is proved (the sides of a rule, say): the walk keeps asking the one still missing at the top step */
   required?: readonly string[];
+  /**
+   * Whether a question key is one he has not been asked before (learn-kit/fresh's `isFresh`, read by the app). When given, a right answer on a key that is
+   * not fresh neither counts toward the proved streak nor breaks it; the walk goes on. Absent, every key counts.
+   */
+  isFresh?: (key: string) => boolean;
 }
 
 // ---- The foundation ----
@@ -133,6 +138,8 @@ export interface Walk<P = unknown> {
   provedStreak: number;
   /** the required facets the steps ask (WalkOptions.required) */
   required: string[];
+  /** WalkOptions.isFresh, when given */
+  isFresh?: (key: string) => boolean;
 }
 
 /** The question being asked, or null once the walk is over. */
@@ -220,6 +227,7 @@ export function startWalk<P>(
     maxQuestions: options.maxQuestions ?? MAX_QUESTIONS,
     provedStreak: options.provedStreak ?? PROVED_STREAK,
     required,
+    ...(options.isFresh ? { isFresh: options.isFresh } : {}),
   };
 }
 
@@ -239,7 +247,7 @@ function finish<P>(walk: Walk<P>, asked: WalkAnswer[], ended: DrillEnd, streak: 
 
 /**
  * One answer to the question being asked. A right answer goes up one step (and the streak of unhinted ones at the top proves the node); a miss goes back
- * halfway between the highest step he holds below it and the one missed; a hinted right stays put and breaks the run. A walk that is over does not change.
+ * halfway between the highest step he holds below it and the one missed; a hinted right stays put and breaks the run; a right on a key that is not fresh (WalkOptions.isFresh) at the top neither counts nor breaks it. A walk that is over does not change.
  */
 export function answerWalk<P>(walk: Walk<P>, right: boolean, hinted: boolean): Walk<P> {
   const q = walk.current;
@@ -247,7 +255,9 @@ export function answerWalk<P>(walk: Walk<P>, right: boolean, hinted: boolean): W
   const asked = [...walk.asked, { step: q.step, facet: q.facet, key: q.key, right, hinted }];
   const top = walk.steps.length;
   const sure = right && !hinted;
-  const streak = sure && q.step === top ? walk.streak + 1 : 0;
+  // a right at the top counts when its key is fresh (or no isFresh is given); a seen one leaves the streak as it was
+  const seen = walk.isFresh !== undefined && !walk.isFresh(q.key);
+  const streak = !sure || q.step !== top ? 0 : seen ? walk.streak : walk.streak + 1;
   const missing = missingFacets(walk, asked);
   if (streak >= walk.provedStreak && missing.length === 0) return finish(walk, asked, 'proved', streak);
   if (asked.length >= walk.maxQuestions) return finish(walk, asked, 'limit', streak);

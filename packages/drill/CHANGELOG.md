@@ -2,6 +2,12 @@
 
 Newest first. Breaking changes come first in a release, each with its migration in one sentence.
 
+## 0.2.0 (2026-10-27)
+
+- New: `WalkOptions.isFresh(key)` (mw-dglxgdz.1). When given, a right answer on a key that is not fresh neither counts toward
+  `PROVED_STREAK` nor breaks the streak at the top step: the walk goes on and the asked list still grows, so a node is proved only on
+  questions the learner has not been asked before. Make it from the ledger of `learn-kit/fresh`. Absent, the walk behaves as before.
+
 ## 0.1.0 (2026-10-22)
 
 - New: the drill engine and the placement, carved from Lampas (mw-79en7t.3), over a `learn-kit/graph` graph and its store, with no

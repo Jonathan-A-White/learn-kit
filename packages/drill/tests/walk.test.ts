@@ -297,3 +297,58 @@ describe('required facets: each must be answered right, unhinted, before the ide
     expect(currentQuestion(state)!.facet.id).toBe('far');
   });
 });
+
+describe('a walk that proves on fresh questions only (options.isFresh)', () => {
+  const allRight = (): { right: boolean } => ({ right: true });
+
+  it('is unchanged when no isFresh is given: rights on any keys prove it', () => {
+    const { walk } = run(begin(rawSteps(), {}), allRight);
+    expect(walk.result?.ended).toBe('proved');
+  });
+
+  it('does not prove on seen keys: the walk goes on to the question limit and the asked list still grows', () => {
+    const { walk, asked } = run(begin(rawSteps(), { isFresh: () => false }), allRight);
+    expect(walk.result?.proved).toBe(false);
+    expect(walk.result?.ended).toBe('limit');
+    expect(asked).toHaveLength(MAX_QUESTIONS);
+    expect(walk.asked).toHaveLength(MAX_QUESTIONS);
+  });
+
+  it('proves on fresh keys, as with no option', () => {
+    const plain = run(begin(rawSteps(), {}), allRight);
+    const fresh = run(begin(rawSteps(), { isFresh: () => true }), allRight);
+    expect(fresh.walk.result?.ended).toBe('proved');
+    expect(fresh.asked.map((q) => q.key)).toEqual(plain.asked.map((q) => q.key));
+  });
+
+  it('counts only the fresh keys at the top step: a seen right neither counts nor breaks the streak', () => {
+    const top = numberSteps(rawSteps()).length;
+    const seen = new Set<string>();
+    // the first question asked at the top step is seen; the next two top-step rights are fresh
+    let state = begin(rawSteps(), { isFresh: (key: string) => !seen.has(key) });
+    for (let step = 1; step < top; step += 1) state = answerWalk(state, true, false);
+    expect(currentQuestion(state)!.step).toBe(top);
+    seen.add(currentQuestion(state)!.key);
+    state = answerWalk(state, true, false); // seen: streak stays 0
+    expect(state.streak).toBe(0);
+    expect(state.result).toBeNull();
+    state = answerWalk(state, true, false); // fresh: 1
+    expect(state.streak).toBe(1);
+    seen.add(currentQuestion(state)!.key);
+    state = answerWalk(state, true, false); // seen again: still 1, not broken
+    expect(state.streak).toBe(1);
+    expect(state.result).toBeNull();
+    state = answerWalk(state, true, false); // fresh: 2, proved
+    expect(state.result?.ended).toBe('proved');
+  });
+
+  it('still breaks the streak on a miss or a hinted right at the top', () => {
+    const top = numberSteps(rawSteps()).length;
+    let state = begin(rawSteps(), { isFresh: () => true });
+    for (let step = 1; step < top; step += 1) state = answerWalk(state, true, false);
+    state = answerWalk(state, true, false);
+    expect(state.streak).toBe(1);
+    state = answerWalk(state, true, true);
+    expect(state.streak).toBe(0);
+  });
+});

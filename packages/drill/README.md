@@ -104,7 +104,9 @@ goes up a step on a right answer and back halfway (rounded down) between the hig
 hinted right neither moves nor counts toward proved. The walk ends `'proved'` (`PROVED_STREAK`, 2, unhinted rights in a row at the
 top step), at its `'edge'` (the step held has the step above it failed) or at the `'limit'` (`MAX_QUESTIONS`, 14). `resultOf(walk)`
 names the strong and weak facets. A step with `retryFirstMiss` asks the same facet again after a first miss; `options.required` are
-facets that must each be answered right, unhinted, before the node is proved.
+facets that must each be answered right, unhinted, before the node is proved. `options.isFresh(key)` (a function the app makes of `learn-kit/fresh`'s ledger, read by
+the app) makes the proof rest on questions not asked before: a right on a key that is not fresh neither counts toward the streak nor
+breaks it, so a walk over seen questions goes on to the limit and does not prove the node.
 
 ### the plan for a gap
 
