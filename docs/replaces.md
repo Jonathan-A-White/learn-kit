@@ -109,6 +109,22 @@ Each row of this table and the next is `| Where | Verdict | Why |`.
 | `spell-forge/src/core/learning/engine.ts:103` | not-covered | `processAttempt` advances a word three successes a stage, regresses it on two failures and masters it on a test out; the test out resembles `testOut`, the rest is the scaffold. |
 | `spell-forge/src/core/learning/engine.ts:228` | not-covered | `sortWordsForLearning` orders a list by length (easy to hard, hard to easy, wave, random) and `findNextWord` (line 297) takes the first not mastered: a frontier of a list with no needs, where `frontierOf` would give the same word but not the order. |
 
+## Seen questions and confirming a missed idea (`learn-kit/fresh`)
+
+Added with `@learn-kit/fresh` 0.1.0 and `@learn-kit/drill` 0.2.0 (mw-dglxgdz.1). Lampas keeps these in the settings store and asks its
+mill for fresh questions; the kit holds the rule and the ledger over an injected `FreshStore`, and the app keeps the store, the rows
+and the asking.
+
+| Where | Verdict | Why |
+| --- | --- | --- |
+| `lampas/src/data/repositories/seenItems.ts:33` | covered | `noteSeen` (and `noteAsked`, which never throws) keeps an idea's newest `MAX_SEEN` (30) questions, one asked again moving up: `markAsked` and `LEDGER_CAP`. The key is the app's (`seenKey` makes it of the prompt and the reference); the kit holds a string. |
+| `lampas/src/data/repositories/seenItems.ts:49` | covered | `listSeen` is `asked`, oldest first, and `listSeenOf` is `asked` over several ideas; whether a key is in the list is `isFresh`. |
+| `lampas/src/data/repositories/seenItems.ts:12` | not-covered | `parseSeen` and the JSON in the settings store are the app's `FreshStore`; `notable` (only a question about a verse, on an idea the mill is asked about) stays in Lampas. |
+| `lampas/src/data/repositories/toConfirm.ts:39` | covered | `listToConfirm` and `isToConfirm` are `toConfirm` and `isToConfirm`; `markToConfirm` and `clearToConfirm` are done by `recordAnswer`. |
+| `lampas/src/data/repositories/toConfirm.ts:73` | not-covered | `missedBefore` and the `confirmed` map read the idea's schedule row; the app reads its own rows and hands the answer to `recordAnswer` as `missedBefore`. |
+| `lampas/src/review/confirm.ts:32` | covered | `confirmAnswer`'s three cases are `recordAnswer`'s verdicts: fresh right is `known`, a seen right after a miss is `to-confirm`, a wrong answer is `missed`, any other right is `seen`. Writing the row, the hint check and `askForMoreItems` stay in Lampas. |
+| `lampas/src/data/grammar/drillIt.ts:50` | covered | The walk's `seen` option (a seen question never counts toward proving an idea) is `WalkOptions.isFresh`: a right answer on a seen key neither counts toward `PROVED_STREAK` nor breaks it. Lampas filters seen questions out of the steps (line 110) and checks the top step can still prove (line 126); the app may keep that, or pass `isFresh`. |
+
 ## Hits of the sweep that are not a graph, a frontier or a scheduler
 
 | Where | Verdict | Why |

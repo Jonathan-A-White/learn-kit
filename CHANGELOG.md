@@ -6,8 +6,24 @@ Each library keeps its own changelog; this one records the repo's releases and p
 
 - [@learn-kit/graph](packages/graph/CHANGELOG.md)
 - [@learn-kit/drill](packages/drill/CHANGELOG.md)
+- [@learn-kit/fresh](packages/fresh/CHANGELOG.md)
 - [@learn-kit/learner](packages/learner/CHANGELOG.md)
 - [@learn-kit/recall](packages/recall/CHANGELOG.md)
+
+## 0.1.9 (2026-10-27, not yet tagged)
+
+- New: `@learn-kit/fresh` 0.1.0 (`learn-kit/fresh`), proving on questions the learner has not seen (mw-dglxgdz.1): a ledger of the
+  question keys asked on each idea (`markAsked`, `asked`, `isFresh`, newest `LEDGER_CAP` kept) and the confirm-on-fresh rule
+  (`recordAnswer` returns `known`, `to-confirm`, `seen` or `missed`; `toConfirm`, `isToConfirm`), over an injected `FreshStore`, with a
+  `MemoryFreshStore` for tests. The commit that lands it is the one apps pin.
+- New: `@learn-kit/drill` 0.2.0, `WalkOptions.isFresh`: a right answer on a seen key neither counts toward the proved streak nor breaks it.
+- Changed: the consumer smoke test also installs and imports `learn-kit/fresh`, and lets it import no other kit library.
+- Package versions: graph 0.4.0, drill 0.2.0, fresh 0.1.0, learner 0.1.0, recall 0.1.0.
+
+## 0.1.8 (2026-10-23, not yet tagged)
+
+- Changed: `@learn-kit/graph` 0.4.0, `nextReview` takes a grade (see its changelog). Package versions: graph 0.4.0, drill 0.1.0,
+  learner 0.1.0, recall 0.1.0.
 
 ## 0.1.7 (2026-10-23, not yet tagged)
 
