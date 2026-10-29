@@ -12,6 +12,15 @@ Verdicts:
 - `not-covered`: learn-kit does not have it; the reason says why, and whether the app keeps it or a later learn-kit package could.
 - `not-scheduler`: a hit of the sweep's words that is not a graph, a frontier or a scheduler (a label, a timer, a poll, a stored field).
 
+<!-- toc -->
+
+- [Hand-built graphs, frontiers and schedulers](#hand-built-graphs-frontiers-and-schedulers)
+- [Seen questions and confirming a missed idea (`learn-kit/fresh`)](#seen-questions-and-confirming-a-missed-idea-learn-kitfresh)
+- [Hits of the sweep that are not a graph, a frontier or a scheduler](#hits-of-the-sweep-that-are-not-a-graph-a-frontier-or-a-scheduler)
+- [The sweep](#the-sweep)
+
+<!-- /toc -->
+
 ## Hand-built graphs, frontiers and schedulers
 
 Each row of this table and the next is `| Where | Verdict | Why |`.
